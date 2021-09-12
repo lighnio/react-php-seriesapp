@@ -43,7 +43,6 @@ function App() {
       ...prevState,
       [name]: value
     }))
-    console.log(serieSelected);
   }
   
   // GET
@@ -66,15 +65,6 @@ function App() {
     f.append('episodios', serieSelected.episodios);
     f.append('plataforma_actual', serieSelected.plataforma_actual);
     f.append('METHOD', "POST");
-    setSerieSelected({
-      id: '',
-      nombre: '',
-      fecha_lanzamiento: '',
-      temporadas: '',
-      episodios: '',
-      plataforma_actual: ''
-    });
-    console.log(serieSelected);
     await axios.post(baseUrl, f)
     .then((response) => {
         setData(data.concat(response.data));
@@ -91,7 +81,8 @@ function App() {
     f.append('episodios', serieSelected.episodios);
     f.append('plataforma_actual', serieSelected.plataforma_actual);
     f.append('METHOD', "PUT");
-    await axios.post(baseUrl, f, {params: {id: selectSerie.id}})
+    console.log("Put id: ", serieSelected.id)
+    await axios.post(baseUrl, f, {params: {id: serieSelected.id}})
     .then((response) => {
         var dataNueva = data;
         dataNueva.map(serie => {
@@ -111,24 +102,22 @@ function App() {
   // DELETE
   const delPet = async() => {
     var f = new FormData();
-    f.append('METHOD', "DEL");
-    await axios.post(baseUrl, f, {params: {id: selectSerie.id}})
+    f.append('METHOD', "DELETE");
+    await axios.post(baseUrl, f, {params: {id: serieSelected.id}})
     .then((response) => {
         setData(data.filter( serie => serie.id !== serieSelected.id));
         modalDeleteState();
     }).catch(error => console.log(error))
   }
 
-  const selectSerie = (serie, modalCase) => {
+  const selectSerie = async(serie, modalCase, id) => {
     setSerieSelected(serie);
-
-    // if(modalCase === "Edit"){
-    //   modalEditState()
-    // }
+    
       (modalCase === "Edit")? 
       modalEditState()
       :
       modalDeleteState()
+      console.log("Serie Selected: ", serieSelected);
   }
 
   return (
@@ -159,7 +148,7 @@ function App() {
                 <td>{serie.plataforma_actual}</td>
                 <td>
                   <button className="btn btn-primary" onClick={() => selectSerie(serie, "Edit")}>Editar</button> {"   "}
-                  <button className="btn btn-danger" onClick={() => selectSerie(serie, "Delete")}>Eliminar</button>
+                  <button className="btn btn-danger" onClick={() => selectSerie(serie, "Delete")}>Eliminar</button>{"   "}
                 </td>
               </tr>
             );
@@ -179,7 +168,7 @@ function App() {
 
             <label>Fecha de Lanzamiento: </label>
             <br />
-            <input type="text" className="form-control" name='lanzamiento' onChange={handleChange}/>
+            <input type="text" className="form-control" name='fecha_lanzamiento' onChange={handleChange}/>
             
             <label>Temporadas: </label>
             <br />
@@ -191,7 +180,7 @@ function App() {
             
             <label>Plataforma Actual: </label>
             <br />
-            <input type="text" className="form-control" name='plataforma' onChange={handleChange}/>
+            <input type="text" className="form-control" name='plataforma_actual' onChange={handleChange}/>
             
           </div>
         </ModalBody>
@@ -213,7 +202,7 @@ function App() {
 
             <label>Fecha de Lanzamiento: </label>
             <br />
-            <input type="text" className="form-control" name='lanzamiento' onChange={handleChange} value={serieSelected && serieSelected.fecha_lanzamiento}/>
+            <input type="text" className="form-control" name='fecha_lanzamiento' onChange={handleChange} value={serieSelected && serieSelected.fecha_lanzamiento}/>
             
             <label>Temporadas: </label>
             <br />
@@ -225,7 +214,7 @@ function App() {
             
             <label>Plataforma Actual: </label>
             <br />
-            <input type="text" className="form-control" name='plataforma' onChange={handleChange} value={serieSelected && serieSelected.plataforma_actual}/>
+            <input type="text" className="form-control" name='plataforma_actual' onChange={handleChange} value={serieSelected && serieSelected.plataforma_actual}/>
             
           </div>
         </ModalBody>
